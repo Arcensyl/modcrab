@@ -4,3 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+# Small-ish crates for some Quality of Life features.
+log = "0.4.21" # Core library for logging.
+simple_logger = "5.0.0" # A basic logger implementation built on the 'log' crate.
+tap = "1.0.1" # Helper functions to enhance Rust's method chaining and dot-call syntax.
+itertools = "0.13.0" # Adds more features to iterators.
+indexmap = "2.2.6" # Provided something like a HashMap, but it is sorted by insertion order.
+thiserror = "1.0.61" # Allows custom errors to derive the Error trait.
+
+# Crates needed for this program's functionality.
+clap = { version = "4.5.7", features = ["derive"] } # Library to enhance this app's CLI features.
+mlua = { version = "0.9.8", features = ["luajit"] } # Lua interpreter needed to run modpack configurations.
+dependency-graph = "0.1.5" # Dependency graph used when determining the mount order for mods.
