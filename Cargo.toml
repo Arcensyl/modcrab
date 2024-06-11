@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# Small-ish crates for some Quality of Life features.
+# Small-ish crates for some quality of life features.
 log = "0.4.21" # Core library for logging.
 simple_logger = "5.0.0" # A basic logger implementation built on the 'log' crate.
 tap = "1.0.1" # Helper functions to enhance Rust's method chaining and dot-call syntax.
