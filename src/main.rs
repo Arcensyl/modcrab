@@ -2,6 +2,8 @@
 //! It focuses on Bethesda games, but it can also handle many other games.
 
 mod prelude;
+mod data;
+mod spec;
 
 use simple_logger::SimpleLogger;
 use log::LevelFilter;
