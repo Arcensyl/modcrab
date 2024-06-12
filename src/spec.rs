@@ -3,6 +3,7 @@
 
 use std::path::PathBuf;
 
+#[derive(PartialEq, Eq, Hash)]
 /// Describes a game that Modcrab is capable of handling.
 pub struct GameSpec {
 	/// The name of the game.
@@ -26,6 +27,7 @@ pub struct GameSpec {
 	common_data_paths: Vec<PathBuf>,
 }
 
+#[derive(PartialEq, Eq, Hash)]
 /// Used to define how a *GameSpec* handles plugins.
 pub struct GamePluginSupportSpec {
 	/// The format tells Modcrab how to inspect plugins.
