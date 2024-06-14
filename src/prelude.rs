@@ -14,4 +14,5 @@ pub use log::warn;
 pub use log::error;
 pub use log::debug;
 
+pub use crate::error::AppError;
 pub use crate::spec::{GameSpec, ModSpec};
