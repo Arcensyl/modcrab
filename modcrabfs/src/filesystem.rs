@@ -123,6 +123,11 @@ impl ModcrabFS {
 			.ok_or(io::Error::other("Cannot create ModcrabFS from empty list"))?
 			.canonicalize()?;
 
+		// The mountpoint cannot be the top-most directory in the overlay.
+		if mountpoint.as_ref().canonicalize()? == surface {
+			return Err(io::Error::from(io::ErrorKind::InvalidInput));
+		}
+
 		// Creates the transformation cache if it doesn't already exist.
 		if let Ok(false) = cache.as_ref().try_exists() {
 			_ = File::create(&cache);
@@ -244,7 +249,6 @@ impl ModcrabFS {
 
 	/// Reads the transformation cache for this filesystem.
 	fn read_cache(&self) -> io::Result<Vec<VirtualFileTransformation>> {
-		info!("Reading cache...");
 		let cache = fs::read(&self.cache)?;
 
 		let transformations = bincode::deserialize(&cache)
@@ -255,7 +259,6 @@ impl ModcrabFS {
 
 	/// Updates the transformation cache.
 	fn update_cache(&self, transformations: Vec<VirtualFileTransformation>) -> io::Result<()> {
-		info!("Updating cache...");
 		let data = bincode::serialize(&transformations)
 			.map_err(|_| io::Error::from(io::ErrorKind::InvalidData))?;
 
@@ -308,12 +311,12 @@ pub const TTL: Duration = Duration::from_secs(1);
 // TODO: Check the logic for each of these methods.
 impl FilesystemMT for ModcrabFS {
     fn init(&self, _req: RequestInfo) -> ResultEmpty {
-        debug!("init");
+        info!("ModcrabFS has been initialized!");
         Ok(())
     }
 
     fn destroy(&self) {
-        debug!("destroy");
+        debug!("Shutting down ModcrabFS...");
     }
 
     fn getattr(&self, _req: RequestInfo, path: &Path, fh: Option<u64>) -> ResultEntry {

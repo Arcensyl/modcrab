@@ -126,9 +126,6 @@ fn read_dir(path: impl AsRef<Path>) -> io::Result<Vec<VirtualFileData>> {
         }
     }
 
-	println!("{entries:?}");
-	println!("{full_paths:?}");
-
 	let final_contents = entries.into_iter()
 		.filter(|e| !(&e.name == "." || &e.name == ".."))
 		.map(|e| VirtualFileData {path: full_paths.remove(&e.name).unwrap(), kind: e.kind, is_root: false})
@@ -298,7 +295,8 @@ impl VirtualFileTree {
 		};
 		
 		let child_data = VirtualFileData {
-			path: PathBuf::from("<VIRTUAL>").join(virt),
+			// We use a fake, impossible path to signify this directory is entirely virtual.
+			path: PathBuf::from("/dev/null").join(virt),
 			kind: FileType::Directory,
 			is_root: false,
 		};
