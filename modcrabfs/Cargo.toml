@@ -1,0 +1,28 @@
+[package]
+name = "modcrabfs"
+authors = ["Arcensyl"]
+description = "A case-insensitive, overlay filesystem."
+license = "MIT"
+version = "0.1.0"
+edition = "2021"
+readme = "README.org"
+
+[dependencies]
+log = "0.4.21"
+tap = "1.0.1"
+fuse_mt = "0.6.1"
+fuser = "0.13" # Version matched to one used by v0.6.1 of 'fuse_mt'.
+libc = "0.2.155"
+nix = { version = "0.29.0", features = ["user", "time", "fs"] }
+petgraph = "0.6.5"
+walkdir = "2.5.0"
+rand = "0.8.5"
+serde = { version = "1.0.203", features = ["derive"] }
+bincode = "1.3.3"
+
+[dev-dependencies]
+simple_logger = "5.0.0"
+crossterm = "0.27.0"
+
+[profile.test]
+inherits = "release"
