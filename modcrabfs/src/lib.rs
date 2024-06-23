@@ -9,9 +9,9 @@ pub use filesystem::ModcrabFS;
 
 mod libc_extras;
 mod libc_wrappers;
-mod tree;
 mod persistence;
 mod shadow;
+mod tree;
 
 #[cfg(test)]
 mod tests;

@@ -5,14 +5,14 @@
 pub use mlua::prelude::*;
 pub use tap::prelude::*;
 
+pub use indexmap::{IndexMap, IndexSet};
 pub use itertools::Itertools;
 pub use thiserror::Error;
-pub use indexmap::{IndexSet, IndexMap};
 
+pub use log::debug;
+pub use log::error;
 pub use log::info;
 pub use log::warn;
-pub use log::error;
-pub use log::debug;
 
 pub use crate::error::AppError;
 pub use crate::error::AppResult;
