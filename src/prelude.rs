@@ -16,4 +16,8 @@ pub use log::warn;
 
 pub use crate::error::AppError;
 pub use crate::error::AppResult;
+pub use crate::util::text::FancyText;
+pub use crate::util::notice::Notice;
+pub use crate::util::notice::NoticePreset;
+
 pub use crate::spec::{GameSpec, ModSpec};

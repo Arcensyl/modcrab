@@ -22,6 +22,10 @@ pub enum AppError {
     #[error(transparent)]
     Bincode(#[from] bincode::Error),
 
+	/// Custom error that simply wraps a *Notice*.
+	#[error("{0}")]
+	Custom(Notice),
+
     /// Error converted from any error that does not have a matching *AppError* variant.
     #[error(transparent)]
     Unknown(#[from] anyhow::Error),
