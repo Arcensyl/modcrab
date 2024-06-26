@@ -1,4 +1,4 @@
-use std::{fs, io, path::Path};
+use std::{fmt::Display, fs, io, path::Path};
 
 use serde::{Deserialize, Serialize};
 
@@ -60,4 +60,15 @@ where
             other => other,
         }
     }
+}
+
+/// Helper function to generate a pretty string based on a slice's contents.
+pub fn display_slice<T: Display> (slice: &[T]) -> String {
+	let mut output = String::new();
+
+	for item in slice.iter() {
+		output.push_str(&format!("{item}, "))
+	}
+
+	output.trim_end_matches(", ").to_owned()
 }

@@ -1,9 +1,9 @@
 //! This module provides the *Notice* struct, which is used for pretty-printing warnings, errors, or other messages to users.
 
-use crate::{prelude::*, util::text::TextStyle};
+use crate::{prelude::*, structs::error::ModpackError, util::text::TextStyle};
 use std::{fmt::Display, io};
 
-use super::text::TextColor;
+use super::{misc::display_slice, text::TextColor};
 
 /// Notices allow you to easily pretty-print warning, errors, and other various information.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -82,6 +82,7 @@ impl From<AppError> for Notice {
         match value {
             AppError::IO(error) => error.into(),
             AppError::Lua(error) => error.into(),
+			AppError::Modpack(error) => error.into(),
 			AppError::Custom(notice) => notice,
 			
             AppError::Bincode(error) => Notice::from_preset(NoticePreset::Error, "(De)serialization")
@@ -156,5 +157,40 @@ impl From<LuaError> for Notice {
 				.add_field("Description", "An unknown error occurred while executing your config.")
 				.add_field("Details", &other.to_string()),
         }
+    }
+}
+
+impl From<ModpackError> for Notice {
+	fn from(value: ModpackError) -> Self {
+		let notice = Notice::from_preset(NoticePreset::Error, "Modpack");
+
+		match value {
+			ModpackError::InvalidModpack => notice
+				.add_field("Description", "The current directory is not a valid modpack.")
+				.add_field("Details", "This is because the current directory doesn't contain a '.modcrab' directory.")
+				.add_field("Suggestion", "If it is supposed to be a modpack, try running 'modcrab init' to regenerate missing files."),
+			
+			ModpackError::EmptyConfig => notice
+				.add_field("Description", "This modpack's configuration directory is empty.")
+				.add_field("Suggestion", "Create a new Lua file under 'config/early' or 'config.main' to get started!"),
+			
+			ModpackError::MissingTarget => notice
+				.add_field("Description", "This modpack does not specify a target game.")
+				.add_field("Suggestion", "Set 'modcrab.target' in your config."),
+			
+			ModpackError::LocalModNotFound(spec) => notice
+				.add_field("Description", &format!("The mod {} is local but isn't installed.", spec.name))
+				.add_field("Suggestion #1", &format!("If this mod should be local, manually add {} to your modpack's 'mods' folder.", spec.name))
+				.add_field("Suggestion #2", &format!("If this mod should be from the Nexus, specify {}'s 'slug' field in your config.", spec.name)),
+			
+			ModpackError::MissingDependency { cause, dep } => notice
+				.add_field("Description", &format!("The mod {} depends on {dep}, which is not in your config.", cause.name))
+				.add_field("Suggestion", &format!("Add {dep}'s specification to your config.")),
+			
+			ModpackError::UnsortableMods(specs) => notice
+				.add_field("Description", "The following mods cannot be sorted, likely due to a dependency cycle.")
+				.add_field("Mods", &display_slice(&specs))
+				.add_field("Suggestion", "Search through the broken mod list, while looking for any illogical dependencies."),
+		}
     }
 }
