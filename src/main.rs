@@ -1,10 +1,8 @@
 //! Modcrab is a programmable mod manager for Linux.
 //! It focuses on Bethesda games, but it can also handle many other games.
 
-mod data;
-mod error;
 mod prelude;
-mod spec;
+mod structs;
 mod util;
 
 use std::{env, io, path::PathBuf};

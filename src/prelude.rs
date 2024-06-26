@@ -14,10 +14,12 @@ pub use log::error;
 pub use log::info;
 pub use log::warn;
 
-pub use crate::error::AppError;
-pub use crate::error::AppResult;
+pub use crate::structs::error::AppError;
+pub use crate::structs::error::AppResult;
 pub use crate::util::text::FancyText;
 pub use crate::util::notice::Notice;
 pub use crate::util::notice::NoticePreset;
 
-pub use crate::spec::{GameSpec, ModSpec};
+pub use crate::structs::data::AppData;
+pub use crate::structs::config::{AppConfig, TargetGame};
+pub use crate::structs::spec::{GameSpec, ModSpec};
