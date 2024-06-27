@@ -12,6 +12,7 @@ pub fn init_modpack() -> AppResult<()> {
 	fs::create_dir_all("config/main")?;
 
 	fs::create_dir_all("mods")?;
+	fs::create_dir_all("overwrite")?;
 	fs::create_dir_all("downloads")?;
 	
 	Ok(())

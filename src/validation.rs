@@ -13,6 +13,7 @@ pub fn validate_modpack() -> AppResult<()> {
 		"config/early",
 		"config/main",
 		"mods",
+		"overwrite",
 		"downloads",
 	].map(|s| PathBuf::from(s));
 
