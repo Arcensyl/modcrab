@@ -12,6 +12,15 @@ pub struct GameSpec {
     /// The name of the game.
     pub name: String,
 
+	/// The default command to run this game.
+	/// If this game is for Windows, this command will wrapped by Proton's one.
+	/// You can put *<root>* in this field to refer to this game's root path. 
+	pub command: String,
+
+	/// Marks this game as being Windows-native.
+	/// This will cause the game to automatically run under Proton.
+	pub is_win: bool,
+	
     /// Paths were the game's root can likely be found.
     /// Modcrab will scan for these paths in case the user's config does not point it to one.
     /// These paths should preferably be absolute as opposed to relative.
@@ -30,6 +39,9 @@ pub struct GameSpec {
 pub fn generate_default_game_specs() -> HashMap<String, GameSpec> {
 	let sse = GameSpec {
 		name: "Skyrim Special Edition".to_owned(),
+
+		command: "<root>/SkyrimSE.exe".to_owned(),
+		is_win: true,
 		
 		common_root_paths: vec![
 			"~/.steam/steam/steamapps/common/Skyrim Special Edition".into(),
@@ -41,6 +53,9 @@ pub fn generate_default_game_specs() -> HashMap<String, GameSpec> {
 
 	let fo4 = GameSpec {
 		name: "Fallout 4".to_owned(),
+
+		command: "<root>/Fallout4.exe".to_owned(),
+		is_win: true,
 		
 		common_root_paths: vec![
 			"~/.steam/steam/steamapps/common/Fallout 4".into(),
@@ -105,5 +120,78 @@ impl Default for ModSpec {
 impl Display for ModSpec {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.name)
+    }
+}
+
+impl<'lua> FromLua<'lua> for ModSpec {
+    fn from_lua(value: LuaValue<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+        if value.is_string() {
+			return Ok(Self {
+				name: String::from_lua(value, lua)?,
+				..Default::default()
+			})
+		}
+
+		let Some(table) = value.as_table() else {
+			return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "ModSpec",
+                message: Some("A mod's specification can only be a string or table.".to_owned()),
+            });
+		};
+
+		let ModSpec {
+			name: _,
+			enabled: def_enabled,
+			dependencies: def_dependencies,
+			after: def_after,
+			priority: def_priority,
+			should_check: def_should_check
+		} = ModSpec::default();
+
+		let Some(name) = table.get::<_, Option<String>>(1)? else {
+			return Err(LuaError::FromLuaConversionError {
+				from: "table",
+				to: "ModSpec",
+				message: Some("The first item in a mod's specification should be a string containing its name.".to_owned()),
+			});
+		};
+
+		let enabled = match table.get::<_, Option<bool>>("enabled")? {
+			Some(bool) => bool,
+			None => def_enabled,
+		};
+
+		let dependencies = match table.get::<_, Option<Vec<String>>>("dependencies")? {
+			Some(deps) => deps,
+			None => def_dependencies,
+		};
+
+		
+		let after = match table.get::<_, Option<Vec<String>>>("after")? {
+			Some(after) => after,
+			None => def_after,
+		};
+
+		let priority = match table.get::<_, Option<u32>>("priority")? {
+			Some(priority) => priority,
+			None => def_priority,
+		};
+
+		let should_check = match table.get::<_, Option<bool>>("check")? {
+			Some(bool) => bool,
+			None => def_should_check,
+		};
+
+		let spec = Self {
+			name,
+			enabled,
+			dependencies,
+			after,
+			priority,
+			should_check,
+		};
+
+		Ok(spec)
     }
 }

@@ -9,6 +9,7 @@ use crate::prelude::*;
 pub fn validate_modpack() -> AppResult<()> {
 	let paths_to_check = [
 		".modcrab",
+		"prefix",
 		"config",
 		"config/early",
 		"config/main",

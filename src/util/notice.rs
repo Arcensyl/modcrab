@@ -139,13 +139,13 @@ impl From<LuaError> for Notice {
 				.add_field("Details", &msg),
 			
             LuaError::ToLuaConversionError { from, to, message } => notice
-				.add_field("Description", &format!("Failed to convert Rust type {from} into the Lua type {to}."))
+				.add_field("Description", &format!("Failed to convert a {from} into a Lua {to}."))
 				.pipe(|n| match message { Some(msg) => n.add_field("Details", &msg), None => n, })
 				.add_field("Note", "This is a bug. Please open an issue using the link below.")
 				.add_field("Link", "https://github.com/Arcensyl/modcrab/issues"),
 			
             LuaError::FromLuaConversionError { from, to, message } => notice
-				.add_field("Description", &format!("Failed to convert Lua type {from} to Rust type {to}."))
+				.add_field("Description", &format!("Failed to convert a Lua {from} into a {to}."))
 				.pipe(|n| match message { Some(msg) => n.add_field("Details", &msg), None => n, }),
 			
             LuaError::WithContext { context, cause } => notice

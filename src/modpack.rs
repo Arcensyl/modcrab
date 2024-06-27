@@ -7,6 +7,7 @@ use crate::prelude::*;
 /// This simply creates all missing directories, so it can also repair an existing instance.
 pub fn init_modpack() -> AppResult<()> {
 	fs::create_dir_all(".modcrab")?;
+	fs::create_dir_all("prefix")?;
 
 	fs::create_dir_all("config/early")?;
 	fs::create_dir_all("config/main")?;
@@ -17,3 +18,5 @@ pub fn init_modpack() -> AppResult<()> {
 	
 	Ok(())
 }
+
+// TODO: Add 'build' command.
