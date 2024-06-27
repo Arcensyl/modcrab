@@ -1,5 +1,8 @@
 * Legal Information from PassthroughFS
-This file contains legal information forwarded from FUSE-MT and PassthroughFS. This is just to ensure compliance with its licenses.
+This file contains legal information relevant to this project. Most of it is forwarded from FUSE-MT and PassthroughFS. This is just to ensure compliance with its licenses.
+
+** Clarification on Modcrab and ModcrabFS's Licenses
+ModcrabFS has a different license from its parent project, Modcrab. While this filesystem has the MIT license, Modcrab, the mod manager, is under GPL 3.0. This was done so other developers could use this filesystem without worrying about GPL 3.0's requirements.
 
 ** FUSE-MT's Licenses
 *** MIT
