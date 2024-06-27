@@ -7,6 +7,7 @@ use crate::prelude::*;
 use super::spec::generate_default_game_specs;
 
 /// The game this modpack is targeting.
+/// Exposed to Lua as 'modcrab.target'.
 #[derive(Serialize, Deserialize)]
 pub struct TargetGame {
     /// The associated specification for this game.

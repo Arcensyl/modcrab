@@ -14,8 +14,7 @@ pub use log::error;
 pub use log::info;
 pub use log::warn;
 
-pub use crate::structs::error::AppError;
-pub use crate::structs::error::AppResult;
+pub use crate::structs::error::{AppError, AppResult, ModpackError};
 pub use crate::util::text::FancyText;
 pub use crate::util::notice::Notice;
 pub use crate::util::notice::NoticePreset;

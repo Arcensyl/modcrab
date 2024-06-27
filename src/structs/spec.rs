@@ -64,6 +64,7 @@ pub fn generate_default_game_specs() -> HashMap<String, GameSpec> {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct ModSpec {
     /// The name of this mod.
+	/// In Lua, this is the first item of the table.
     pub name: String,
 
     /// Determines if this mod should be loaded.
@@ -81,6 +82,24 @@ pub struct ModSpec {
     /// A lower priority is placed earlier in the mod load order.
     /// If this mod has any that it loads after, a lower priority will place it closer to the latest preceeding mod.
     pub priority: u32,
+
+	/// Determines if Modcrab will check this mod's structure for validity.
+	/// For example, a Skyrim mod would have an invalid structure if it had a 'data' folder in its root.
+	/// This field is exposed to Lua as 'check'.
+	pub should_check: bool,
+}
+
+impl Default for ModSpec {
+    fn default() -> Self {
+        Self {
+			name: "DEFAULT".to_owned(), // This default field shouldn't be used.
+			enabled: true,
+			dependencies: Vec::new(),
+			after: Vec::new(),
+			priority: 50,
+			should_check: true,
+		}
+    }
 }
 
 impl Display for ModSpec {

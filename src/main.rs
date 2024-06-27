@@ -2,6 +2,8 @@
 //! It focuses on Bethesda games, but it can also handle many other games.
 
 mod prelude;
+mod modpack;
+mod validation;
 mod structs;
 mod util;
 
@@ -11,6 +13,7 @@ use std::{env, io, path::PathBuf};
 // use simple_logger::SimpleLogger;
 
 use clap::{Parser, Subcommand};
+use modpack::init_modpack;
 
 use crate::prelude::*;
 
@@ -87,7 +90,7 @@ fn main() {
 /// Runs the command specified by the passed CLI arguements.
 fn run_command(args: Cli) -> AppResult<()> {
     match args.cmd {
-        Command::Init => todo!(),
+        Command::Init => init_modpack()?,
         Command::Build => todo!(),
         Command::Run { tool } => todo!(),
     }
