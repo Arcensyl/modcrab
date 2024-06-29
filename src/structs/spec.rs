@@ -3,7 +3,7 @@
 
 use std::{collections::HashMap, fmt::Display, path::PathBuf};
 
-use crate::prelude::*;
+use crate::{lua::convert_table_item_to_vec, prelude::*};
 use serde::{Deserialize, Serialize};
 
 /// Describes a game that Modcrab is capable of handling.
@@ -83,8 +83,15 @@ pub struct ModSpec {
     pub name: String,
 
     /// Determines if this mod should be loaded.
-    pub enabled: bool,
+    pub is_enabled: bool,
 
+	/// Determines if this mod should be overlayed over the game's root directory.
+	pub is_root: bool,
+
+	/// This mod's ID on NexusMods.
+	/// This used to automatically install this mod when it is missing.
+	pub id: Option<String>,
+	
     /// A list of the names of mods this one depends on.
     /// This mod will always be loaded before this one.
     pub dependencies: Vec<String>,
@@ -108,7 +115,9 @@ impl Default for ModSpec {
     fn default() -> Self {
         Self {
 			name: "DEFAULT".to_owned(), // This default field shouldn't be used.
-			enabled: true,
+			is_enabled: true,
+			is_root: false,
+			id: None,
 			dependencies: Vec::new(),
 			after: Vec::new(),
 			priority: 50,
@@ -142,9 +151,11 @@ impl<'lua> FromLua<'lua> for ModSpec {
 
 		let ModSpec {
 			name: _,
-			enabled: def_enabled,
-			dependencies: def_dependencies,
-			after: def_after,
+			is_enabled: def_is_enabled,
+			is_root: def_is_root,
+			id: _,
+			dependencies: _,
+			after: _,
 			priority: def_priority,
 			should_check: def_should_check
 		} = ModSpec::default();
@@ -157,22 +168,22 @@ impl<'lua> FromLua<'lua> for ModSpec {
 			});
 		};
 
-		let enabled = match table.get::<_, Option<bool>>("enabled")? {
+		let is_enabled = match table.get::<_, Option<bool>>("enabled")? {
 			Some(bool) => bool,
-			None => def_enabled,
+			None => def_is_enabled,
 		};
 
-		let dependencies = match table.get::<_, Option<Vec<String>>>("dependencies")? {
-			Some(deps) => deps,
-			None => def_dependencies,
+		let is_root = match table.get::<_, Option<bool>>("root")? {
+			Some(bool) => bool,
+			None => def_is_root,
 		};
 
+		let id = table.get::<_, Option<String>>("id")?;
+
+		let dependencies = convert_table_item_to_vec(&table, "dependencies")?;
+
+		let after = convert_table_item_to_vec(&table, "after")?;
 		
-		let after = match table.get::<_, Option<Vec<String>>>("after")? {
-			Some(after) => after,
-			None => def_after,
-		};
-
 		let priority = match table.get::<_, Option<u32>>("priority")? {
 			Some(priority) => priority,
 			None => def_priority,
@@ -185,7 +196,9 @@ impl<'lua> FromLua<'lua> for ModSpec {
 
 		let spec = Self {
 			name,
-			enabled,
+			is_enabled,
+			is_root,
+			id,
 			dependencies,
 			after,
 			priority,

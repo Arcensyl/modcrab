@@ -4,16 +4,14 @@
 mod prelude;
 mod modpack;
 mod validation;
+mod lua;
 mod structs;
 mod util;
 
-use std::{env, io, path::PathBuf};
-
-// use log::LevelFilter;
-// use simple_logger::SimpleLogger;
+use std::{env, path::PathBuf};
 
 use clap::{Parser, Subcommand};
-use modpack::init_modpack;
+use modpack::{build_modpack, init_modpack};
 
 use crate::prelude::*;
 
@@ -46,14 +44,6 @@ enum Command {
 
 /// Entrypoint for Modcrab.
 fn main() {
-    // SimpleLogger::new()
-    //     .with_colors(true)
-    //     .with_level(LevelFilter::Info)
-    //     .init()
-    //     .expect("Failed to start logger!");
-
-    // info!("Hello from Modcrab!");
-
     let args = Cli::parse();
 
 	let mut old_cwd = None;
@@ -91,7 +81,7 @@ fn main() {
 fn run_command(args: Cli) -> AppResult<()> {
     match args.cmd {
         Command::Init => init_modpack()?,
-        Command::Build => todo!(),
+        Command::Build => build_modpack()?,
         Command::Run { tool } => todo!(),
     }
 

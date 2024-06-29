@@ -1,6 +1,6 @@
 //! This module provides functions to check and ensure the validity of modpack instances.
 
-use std::{ffi::OsString, fs, path::PathBuf};
+use std::{collections::HashSet, ffi::OsString, fs, path::PathBuf};
 
 use crate::prelude::*;
 
@@ -11,18 +11,16 @@ pub fn validate_modpack() -> AppResult<()> {
 		".modcrab",
 		"prefix",
 		"config",
-		"config/early",
-		"config/main",
 		"mods",
 		"overwrite",
 		"downloads",
 	].map(|s| PathBuf::from(s));
 
-	if !paths_to_check.into_iter()
-		.all(|p| p.exists()) {	
+	if paths_to_check.into_iter()
+		.any(|p| !p.exists()) {
 			return Err(AppError::Modpack(ModpackError::InvalidModpack))
 		}
-	
+
 	Ok(())
 }
 
@@ -72,6 +70,45 @@ pub fn validate_mod(spec: &ModSpec, data: Option<&mut AppData>) -> AppResult<()>
 			.add_field("Suggestion #2", "If this is intentional, you can hide this warning by setting 'check' to false for this mod.");
 
 		data.notices.push(warning);
+	}
+
+	Ok(())
+}
+
+/// Tests an entire list of mods for validity.
+/// This function will eventually download missing mods using the NexusMods API.
+pub fn validate_mod_list(data: &mut AppData, mods: &mut IndexMap<String, ModSpec>) -> AppResult<()> {
+	// This is a stupid hack, but its 7 AM and I just want my code to compile.
+	let mod_keys: HashSet<_> = mods.keys()
+		.map(|k| k.clone())
+		.collect();
+	
+	for spec in mods.values_mut() {
+		// As no AppData instance is provided, this can only fail when the checked mod is not installed.
+		if let Err(error) = validate_mod(spec, None) {
+			match spec.id {
+				Some(_) => todo!(), // Future entrypoint for Nexus API
+				None => return Err(error),
+			}
+		}
+
+		// Throws an error for any missing dependencies.
+		for dep in spec.dependencies.iter() {
+			if !mod_keys.contains(&dep.to_lowercase()) {
+				return Err(AppError::Modpack(ModpackError::MissingDependency {
+					cause: spec.clone(),
+					dep: dep.to_owned(),
+				}));
+			}
+		}
+
+		// Invalid entries in the 'after' list are simply removed and ignored.
+		spec.after = spec.after.drain(..)
+			.filter(|ps| mod_keys.contains(&ps.to_lowercase()))
+			.collect();
+
+		// We can run a full structural check now.
+		validate_mod(spec, Some(data))?;
 	}
 
 	Ok(())

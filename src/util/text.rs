@@ -1,3 +1,5 @@
+//! This module provides facilities for coloring and styling strings.
+
 // Source for ANSI codes: https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
 
 /// A trait to provide text styling capability to strings.

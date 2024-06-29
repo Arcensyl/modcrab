@@ -1,3 +1,5 @@
+//! This module contains the structs usually accessed by a modpack's Lua config.
+
 use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
@@ -8,7 +10,7 @@ use super::spec::generate_default_game_specs;
 
 /// The game this modpack is targeting.
 /// Exposed to Lua as 'modcrab.target'.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct TargetGame {
     /// The associated specification for this game.
     pub spec: GameSpec,
@@ -29,7 +31,7 @@ pub struct TargetGame {
 
 /// A raw version of *TargetGame* designed to be generated from Lua.
 /// See *TargetGame*'s docs for information on most fields.
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct RawTargetGame {
 	/// A key used for retrieving this game's spec.
 	pub spec_key: String,
@@ -100,8 +102,8 @@ impl<'lua> FromLua<'lua> for RawTargetGame {
 }
 
 /// Configuration set by the end user.
-/// This is mostly configured by **init.lua**.
-#[derive(Serialize, Deserialize)]
+/// This struct is exposed to Lua via the 'modcrab' table.
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     /// A list of games supported by Modcrab.
     pub games: HashMap<String, GameSpec>,
@@ -151,5 +153,14 @@ impl LuaUserData for AppConfig {
 			this.proton = Some(PathBuf::from(value));
 			Ok(())
 		})
+	}
+}
+
+impl<'lua> FromLua<'lua> for AppConfig {
+	fn from_lua(value: LuaValue<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
+		match value {
+			LuaValue::UserData(data) => Ok(data.borrow::<Self>()?.clone()),
+			_ => unreachable!(),
+		}
 	}
 }

@@ -1,3 +1,5 @@
+//! This module is the general place for utilities that don't need their own module.
+
 use std::{fmt::Display, fs, io, path::Path};
 
 use serde::{Deserialize, Serialize};

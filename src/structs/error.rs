@@ -1,3 +1,5 @@
+//! This module contains the errors used all over this codebase.
+
 use std::io;
 
 use crate::prelude::*;
@@ -42,10 +44,6 @@ pub enum ModpackError {
 	/// Indicates the current directory is not a modpack.
 	#[error("The current directory is missing a '.modcrab' folder.")]
 	InvalidModpack,
-
-	/// This modpack has no Lua configuration files.
-	#[error("Your modpack has zero configuration files.")]
-	EmptyConfig,
 
 	/// This modpack's config never sets the 'target' field.
 	#[error("Your config does not specify a target game.")]

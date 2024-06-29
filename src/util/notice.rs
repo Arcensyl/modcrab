@@ -170,10 +170,6 @@ impl From<ModpackError> for Notice {
 				.add_field("Details", "This is because the current directory doesn't contain a '.modcrab' directory.")
 				.add_field("Suggestion", "If it is supposed to be a modpack, try running 'modcrab init' to regenerate missing files."),
 			
-			ModpackError::EmptyConfig => notice
-				.add_field("Description", "This modpack's configuration directory is empty.")
-				.add_field("Suggestion", "Create a new Lua file under 'config/early' or 'config.main' to get started!"),
-			
 			ModpackError::MissingTarget => notice
 				.add_field("Description", "This modpack does not specify a target game.")
 				.add_field("Suggestion", "Set 'modcrab.target' in your config."),
