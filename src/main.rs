@@ -34,12 +34,6 @@ enum Command {
 
     /// Builds your modpack's config and acquires any missing mods.
     Build,
-
-    /// Runs this modpack's target game or one of its tools.
-    Run {
-        /// If this is set, Modcrab will run this tool instead of the target game.
-        tool: Option<String>,
-    },
 }
 
 /// Entrypoint for Modcrab.
@@ -82,7 +76,6 @@ fn run_command(args: Cli) -> AppResult<()> {
     match args.cmd {
         Command::Init => init_modpack()?,
         Command::Build => build_modpack()?,
-        Command::Run { tool } => todo!(),
     }
 
     Ok(())

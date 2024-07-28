@@ -206,14 +206,6 @@ impl From<GameError> for Notice {
 				.add_field("Suggestion #1", "Change the target game's name to correspond with a known game specification.")
 				.add_field("Suggestion #2", &format!("Write your own specification for {} so Modcrab knows how to manage it.", target.spec_key)),
 			
-			GameError::MissingProton => notice
-				.add_field("Description", "Your config does not specify a Proton binary to use, but the game or a tool is for Windows.")
-				.add_field("Suggestion", "Set 'modcrab.proton', to a Proton binary's path, in your config."),
-			
-			GameError::InvalidProton => notice
-				.add_field("Description", "The config's 'modcrab.proton' field does not point to a valid file.")
-				.add_field("Suggestion", "Ensure the path in 'modcrab.proton' is valid."),
-			
 			GameError::ScanUnavailable(label) => notice
 				.add_field("Description", &format!("This config does not explicitly set its target's {label} path, but the game's specification not support automatically determining that path."))
 				.add_field("Suggestion", &format!("Set 'modcrab.target.{label}' in your config.")),

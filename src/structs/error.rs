@@ -82,14 +82,6 @@ pub enum GameError {
 	#[error("This modpack's target refers to the specification for {}, but that doesn't exist.", .0.spec_key)]
 	MissingSpec(RawTargetGame),
 
-	/// This modpack does not specify a Proton binary to use, but the target game or one of the tools is for Windows.
-	#[error("Your config does not specify a path to Proton, but the game or a tool requires it.")]
-	MissingProton,
-
-	/// The specified path for Proton points to a non-existent file.
-	#[error("The provided Proton path does not exist.")]
-	InvalidProton,
-	
 	/// This modpack's target does not specify a path that doesn't support automatic detection.
 	/// This is caused by the target's selected specification not listing any default paths to search for.
 	/// This error wraps a label referring to what kind of path was being automatically determined.

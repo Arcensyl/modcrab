@@ -12,15 +12,6 @@ pub struct GameSpec {
     /// The name of the game.
     pub name: String,
 
-	/// The default command to run this game.
-	/// If this game is for Windows, this command will wrapped by Proton's one.
-	/// You can put *<root>* in this field to refer to this game's root path. 
-	pub command: String,
-
-	/// Marks this game as being Windows-native.
-	/// This will cause the game to automatically run under Proton.
-	pub is_win: bool,
-	
     /// Paths were the game's root can likely be found.
     /// Modcrab will scan for these paths in case the user's config does not point it to one.
     /// These paths should preferably be absolute as opposed to relative.
@@ -60,9 +51,6 @@ pub fn generate_default_game_specs() -> HashMap<String, GameSpec> {
 	let sse = GameSpec {
 		name: "Skyrim Special Edition".to_owned(),
 
-		command: "<root>/SkyrimSE.exe".to_owned(),
-		is_win: true,
-		
 		common_root_paths: vec![
 			"~/.steam/steam/steamapps/common/Skyrim Special Edition".into(),
 		],
@@ -74,9 +62,6 @@ pub fn generate_default_game_specs() -> HashMap<String, GameSpec> {
 	let fo4 = GameSpec {
 		name: "Fallout 4".to_owned(),
 
-		command: "<root>/Fallout4.exe".to_owned(),
-		is_win: true,
-		
 		common_root_paths: vec![
 			"~/.steam/steam/steamapps/common/Fallout 4".into(),
 		],
