@@ -1,8 +1,10 @@
 //! This module contains the errors used all over this codebase.
 
-use std::io;
+use std::{io, path::PathBuf};
 
 use crate::prelude::*;
+
+use super::config::RawTargetGame;
 
 /// Convenience wrapper around *Result<T, AppError>*.
 pub type AppResult<T> = Result<T, AppError>;
@@ -28,6 +30,9 @@ pub enum AppError {
 	#[error(transparent)]
 	Modpack(ModpackError),
 
+	#[error(transparent)]
+	Game(GameError),
+
 	/// Custom error that simply wraps a *Notice*.
 	#[error("{0}")]
 	Custom(Notice),
@@ -50,7 +55,7 @@ pub enum ModpackError {
 	MissingTarget,
 
 	/// A local mod is not installed.
-	/// By local, this means a mod that does not have a Nexus slug specified.
+	/// By local, this means a mod that does not have a Nexus ID specified.
 	#[error("The local mod {} is not installed.", .0.name)]
 	LocalModNotFound(ModSpec),
 
@@ -68,4 +73,41 @@ pub enum ModpackError {
 	/// As missing dependencies are already handled, this usually means there is a cyclic dependency somewhere.
 	#[error("These mods cannot be sorted: {0:?}")]
 	UnsortableMods(Vec<ModSpec>),
+}
+
+/// An error related to issues involving a *GameSpec* or *TargetGame*.
+#[derive(Error, Debug)]
+pub enum GameError {
+	/// This modpack's target refers to a game specification that doesn't exist.
+	#[error("This modpack's target refers to the specification for {}, but that doesn't exist.", .0.spec_key)]
+	MissingSpec(RawTargetGame),
+
+	/// This modpack does not specify a Proton binary to use, but the target game or one of the tools is for Windows.
+	#[error("Your config does not specify a path to Proton, but the game or a tool requires it.")]
+	MissingProton,
+
+	/// The specified path for Proton points to a non-existent file.
+	#[error("The provided Proton path does not exist.")]
+	InvalidProton,
+	
+	/// This modpack's target does not specify a path that doesn't support automatic detection.
+	/// This is caused by the target's selected specification not listing any default paths to search for.
+	/// This error wraps a label referring to what kind of path was being automatically determined.
+	#[error("Automatically determining this game's {0} path is unsupported.")]
+	ScanUnavailable(String),
+	
+	/// Indicates Modcrab could not automatically determine one of the game's paths.
+	/// This error wraps a label referring to what kind of path was being automatically determined.
+	#[error("Failed to automatically determine the game's {0} path.")]
+	ScanFailed(String),
+
+	/// A modpack's target explicitly sets one of the game's paths, but the path they provided doesn't exist.
+	#[error("This modpack's target sets the game's {label} path to '{path}', but that path does not exist.")]
+	InvalidPath {
+		/// The kind of path this is.
+		label: String,
+
+		/// The path that does not exist.
+		path: PathBuf,
+	}
 }

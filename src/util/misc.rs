@@ -1,6 +1,6 @@
 //! This module is the general place for utilities that don't need their own module.
 
-use std::{fmt::Display, fs, io, path::Path};
+use std::{fmt::Display, fs, io, path::{Path, PathBuf}};
 
 use serde::{Deserialize, Serialize};
 
@@ -73,4 +73,33 @@ pub fn display_slice<T: Display> (slice: &[T]) -> String {
 	}
 
 	output.trim_end_matches(", ").to_owned()
+}
+
+/// Builds a new *String* with a string slice transformed by a map between patterns and replacement strings.
+pub fn apply_string_sub_map(text: impl AsRef<str>, map: &[(impl AsRef<str>, impl AsRef<str>)]) -> String {
+	let text = text.as_ref();
+	let mut out = String::from(text);
+
+	for (from, to) in map.iter() {
+		out = out.replace(from.as_ref(), to.as_ref());
+	}
+
+	out
+}
+
+/// Replaces a path's prefix of '~' with the user's home directory.
+/// If a path does not start with '~', this function will return a unchanged copy of that path instead.
+pub fn replace_path_home_prefix(path: impl AsRef<Path>) -> AppResult<PathBuf> {
+	let path = path.as_ref();
+
+	if !path.starts_with("~") { return Ok(path.to_owned()); }
+
+	let Some(home) = dirs::home_dir() else {
+		let error = Notice::from_preset(NoticePreset::Error, "Other")
+			.add_field("Description", "Failed to retrieve the user's home directory.");
+
+		return Err(AppError::Custom(error));
+	};
+
+	Ok(home.join(path.strip_prefix("~").unwrap()))
 }

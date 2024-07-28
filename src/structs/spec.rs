@@ -3,7 +3,7 @@
 
 use std::{collections::HashMap, fmt::Display, path::PathBuf};
 
-use crate::{lua::convert_table_item_to_vec, prelude::*};
+use crate::{lua::convert_table_item_to_vec, prelude::*, util::misc::replace_path_home_prefix};
 use serde::{Deserialize, Serialize};
 
 /// Describes a game that Modcrab is capable of handling.
@@ -33,6 +33,26 @@ pub struct GameSpec {
     /// Like *GameSpec::common_root_paths*, but for a game's data directory.
     /// Not to be confused with Bethesda games' literal 'data' directory, but instead refers to were they keep saves and the load order.
     pub common_data_paths: Vec<PathBuf>,
+}
+
+impl GameSpec {
+	/// Scan for this game's root path using a list of common locations. 
+	pub fn scan_for_root(&self) -> AppResult<PathBuf> {
+		if self.common_root_paths.is_empty() {
+			return Err(AppError::Game(GameError::ScanUnavailable("root".to_string())))
+		}
+		
+		let mut real;
+		for path in self.common_root_paths.iter() {
+			real = replace_path_home_prefix(path)?;
+
+			if real.exists() {
+				return Ok(real);
+			}
+		}
+
+		Err(AppError::Game(GameError::ScanFailed("root".to_owned()))) 
+	}
 }
 
 /// Generates the specs for games that Modcrab offers OOTB support for.

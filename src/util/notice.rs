@@ -1,6 +1,6 @@
 //! This module provides the *Notice* struct, which is used for pretty-printing warnings, errors, or other messages to users.
 
-use crate::{prelude::*, structs::error::ModpackError, util::text::TextStyle};
+use crate::{prelude::*, structs::error::{GameError, ModpackError}, util::text::TextStyle};
 use std::{fmt::Display, io};
 
 use super::{misc::display_slice, text::TextColor};
@@ -23,6 +23,9 @@ pub enum NoticePreset {
 	/// A yellow notice with the prefix "WARN".
     Warning,
 
+	/// A green notice with the prefix "DONE".
+	Success,
+
 	/// A cyan notice with the prefix "STATS".
 	Statistics,
 }
@@ -43,6 +46,7 @@ impl Notice {
         match preset {
             NoticePreset::Error => Notice::new(TextColor::Red, "ERROR", header),
             NoticePreset::Warning => Notice::new(TextColor::Yellow, "WARN", header),
+			NoticePreset::Success => Notice::new(TextColor::Green, "DONE", header),
 			NoticePreset::Statistics => Notice::new(TextColor::Cyan, "STATS", header),
         }
     }
@@ -83,6 +87,7 @@ impl From<AppError> for Notice {
             AppError::IO(error) => error.into(),
             AppError::Lua(error) => error.into(),
 			AppError::Modpack(error) => error.into(),
+			AppError::Game(error) => error.into(),
 			AppError::Custom(notice) => notice,
 			
             AppError::Bincode(error) => Notice::from_preset(NoticePreset::Error, "(De)serialization")
@@ -189,4 +194,37 @@ impl From<ModpackError> for Notice {
 				.add_field("Suggestion", "Search through the broken mod list, while looking for any illogical dependencies."),
 		}
     }
+}
+
+impl From<GameError> for Notice {
+    fn from(value: GameError) -> Self {
+        let notice = Notice::from_preset(NoticePreset::Error, "Game");
+
+		match value {
+			GameError::MissingSpec(target) => notice
+				.add_field("Description", &format!("This modpack's target game is {}, but that game's specification doesn't exist.", target.spec_key))
+				.add_field("Suggestion #1", "Change the target game's name to correspond with a known game specification.")
+				.add_field("Suggestion #2", &format!("Write your own specification for {} so Modcrab knows how to manage it.", target.spec_key)),
+			
+			GameError::MissingProton => notice
+				.add_field("Description", "Your config does not specify a Proton binary to use, but the game or a tool is for Windows.")
+				.add_field("Suggestion", "Set 'modcrab.proton', to a Proton binary's path, in your config."),
+			
+			GameError::InvalidProton => notice
+				.add_field("Description", "The config's 'modcrab.proton' field does not point to a valid file.")
+				.add_field("Suggestion", "Ensure the path in 'modcrab.proton' is valid."),
+			
+			GameError::ScanUnavailable(label) => notice
+				.add_field("Description", &format!("This config does not explicitly set its target's {label} path, but the game's specification not support automatically determining that path."))
+				.add_field("Suggestion", &format!("Set 'modcrab.target.{label}' in your config.")),
+			
+			GameError::ScanFailed(label) => notice
+				.add_field("Description", &format!("Failed to automatically determine the target game's {label} path."))
+				.add_field("Suggestion", &format!("Tell Modcrab where to find this by explicitly setting the 'modcrab.target.{label}' field.")),
+
+			GameError::InvalidPath { label, path } => notice
+				.add_field("Description", &format!("The game's {label} path, '{}', does not point to a valid location.", path.display()))
+				.add_field("Suggestion", &format!("Ensure the path in 'modcrab.target.{label}' is valid.")),
+		}
+	}
 }

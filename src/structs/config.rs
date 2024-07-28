@@ -4,7 +4,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use crate::prelude::*;
+use crate::{prelude::*, util::misc::{apply_string_sub_map, replace_path_home_prefix}};
 
 use super::spec::generate_default_game_specs;
 
@@ -17,21 +17,21 @@ pub struct TargetGame {
 
 	/// The command to run the game.
 	/// If this game is Windows-native, this command will ran under Proton.
-	/// This will fallback to game's default command if not set.
-	pub command: Option<String>,
+	/// This will fallback to game's default command if not set in this target's raw equivalent.
+	pub command: String,
 
     /// This game's root path (the one that holds its binary).
     /// If this is *None*, Modcrab will attempt to find this path using the specification.
-    pub root_path: Option<PathBuf>,
+    pub root_path: PathBuf,
 
     ///  This game's path for data, which is where it keeps saves and the load order.
     /// Like the other paths, Modcrab will attempt to automatically find this if not specified.
-    pub data_path: Option<PathBuf>,
+    pub data_path: Option<PathBuf>, // TODO: Update this.
 }
 
 /// A raw version of *TargetGame* designed to be generated from Lua.
 /// See *TargetGame*'s docs for information on most fields.
-#[derive(Default, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct RawTargetGame {
 	/// A key used for retrieving this game's spec.
 	pub spec_key: String,
@@ -45,20 +45,31 @@ impl RawTargetGame {
 	/// Uses this struct and an *AppData* reference to build a real *TargetGame*.
 	pub fn to_real(self, data: &AppData) -> AppResult<TargetGame> {
 		let Some(spec) = data.config.games.get(&self.spec_key.to_lowercase()) else {
-			// TODO: Consider making this a unique ModpackError.
-			let error = Notice::from_preset(NoticePreset::Error, "Modpack")
-				.add_field("Description", &format!("This modpack's target game is {}, but that game's specification doesn't exist.", self.spec_key))
-				.add_field("Suggestion #1", "Change the target game's name to correspond with a known game specification.")
-				.add_field("Suggestion #2", &format!("Write your own specification for {} so Modcrab knows how to manage it.", self.spec_key));
-			
-			return Err(AppError::Custom(error));
+			return Err(AppError::Game(GameError::MissingSpec(self)));
 		};
 
+		let root_path = match self.root_path {
+			Some(ref path) => replace_path_home_prefix(path)?,
+			None => spec.scan_for_root()?,
+		};
+
+		let Some(root_path_str) = root_path.to_str() else {
+			let error = Notice::from_preset(NoticePreset::Error, "Other")
+				.add_field("Description", "Game's root path is not valid UTF-8.");
+
+			return Err(AppError::Custom(error));
+		};
+		
+		let command = match self.command {
+			Some(cmd) => apply_string_sub_map(&cmd, &[("<root>", root_path_str)]),
+			None => apply_string_sub_map(&spec.command, &[("<root>", root_path_str)]),
+		};
+		
 		let real = TargetGame {
 			spec: spec.clone(),
-			command: self.command,
-			root_path: self.root_path.map(|s| PathBuf::from(s)),
-			data_path: self.data_path.map(|s| PathBuf::from(s)),
+			command,
+			root_path,
+			data_path: self.data_path.map(|s| PathBuf::from(s)), // TODO: Update this.
 		};
 
 		Ok(real)
