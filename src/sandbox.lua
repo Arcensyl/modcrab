@@ -28,7 +28,7 @@ return {
     type = type,
     xpcall = xpcall,
 
-    -- Coroutines are not included sandbox, but they could be placed here if needed.
+    -- Coroutines are not included in the sandbox, but they could be placed here if needed.
 
     -- Strings
     string = {
