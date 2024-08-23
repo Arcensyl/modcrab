@@ -30,6 +30,7 @@ pub enum AppError {
 	#[error(transparent)]
 	Modpack(ModpackError),
 
+	/// Error returned by failing game-related operations.
 	#[error(transparent)]
 	Game(GameError),
 
@@ -93,7 +94,7 @@ pub enum GameError {
 	#[error("Failed to automatically determine the game's {0} path.")]
 	ScanFailed(String),
 
-	/// A modpack's target explicitly sets one of the game's paths, but the path they provided doesn't exist.
+	/// Indicates this modpack points to a path that doesn't exist.
 	#[error("This modpack's target sets the game's {label} path to '{path}', but that path does not exist.")]
 	InvalidPath {
 		/// The kind of path this is.

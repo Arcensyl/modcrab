@@ -1,6 +1,6 @@
 //! This module is the general place for utilities that don't need their own module.
 
-use std::{fmt::Display, fs, io, path::{Path, PathBuf}};
+use std::{fmt::Display, fs, io::{self, Read, Write}, path::{Path, PathBuf}};
 
 use serde::{Deserialize, Serialize};
 
@@ -73,6 +73,22 @@ pub fn display_slice<T: Display> (slice: &[T]) -> String {
 	}
 
 	output.trim_end_matches(", ").to_owned()
+}
+
+/// Prints the provided message, and then waits for the user to press the enter key.
+/// Based on this function from Rust's forum: <https://users.rust-lang.org/t/rusts-equivalent-of-cs-system-pause/4494/4>
+pub fn wait_for_enter_key(msg: impl AsRef<str>) -> AppResult<()> {
+	let mut stdin = io::stdin();
+	let mut stdout = io::stdout();
+
+	// Writes and manually flushes STDOUT so the cursor is at the end.
+	stdout.write(msg.as_ref().as_bytes())?;
+	stdout.flush()?;
+
+	// Reads a single byte from STDIN, and then discards it.
+	let _ = stdin.read(&mut [0u8])?;
+
+	Ok(())
 }
 
 /// Builds a new *String* with a string slice transformed by a map between patterns and replacement strings.

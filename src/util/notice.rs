@@ -108,20 +108,23 @@ impl From<io::Error> for Notice {
         match value.kind() {
             io::ErrorKind::NotFound => notice
 				.add_field("Description", "Modcrab tried to access a file that doesn't exist.")
+				.add_field("Details", &value.to_string())
 				.add_field("Suggestion", "Run 'modcrab repair' to attempt to regenerate any missing files."),
 			
             io::ErrorKind::PermissionDenied => notice
 				.add_field("Description", "Modcrab tried to access a file, but it didn't have the right permissions.")
+				.add_field("Details", &value.to_string())
 				.add_field("Suggestion", "Ensure you have full permissions for all files in this modpack."),
 			
             io::ErrorKind::AlreadyExists => notice
 				.add_field("Description", "Modcrab tried to create a new file, but that file already exists.")
+				.add_field("Details", &value.to_string())
 				.add_field("Note", "This error is likely a bug. Please open an issue using the link below.")
 				.add_field("Link", "https://github.com/Arcensyl/modcrab/issues"),
 			
-            other => notice
+            _ => notice
 				.add_field("Description", "An unknown error has occurred!")
-				.add_field("Details", &other.to_string()),
+				.add_field("Details", &value.to_string()),
         }
     }
 }

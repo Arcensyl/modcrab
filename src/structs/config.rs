@@ -16,7 +16,7 @@ pub struct TargetGame {
     pub spec: GameSpec,
 
     /// This game's root path (the one that holds its binary).
-    /// If this is *None*, Modcrab will attempt to find this path using the specification.
+    /// If this wasn't explicitly specified, it was found automatically by Modcrab.
     pub root_path: PathBuf,
 
     ///  This game's path for data, which is where it keeps saves and the load order.

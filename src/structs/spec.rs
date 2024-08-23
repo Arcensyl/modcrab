@@ -70,9 +70,19 @@ pub fn generate_default_game_specs() -> HashMap<String, GameSpec> {
 		common_data_paths: Vec::new(),
 	};
 
-	let mut games = HashMap::with_capacity(2);
+	let ut99 = GameSpec {
+		name: "Unreal Tournament(1999)".to_owned(),
+
+		common_root_paths: Vec::new(),
+
+		mod_directory: "".to_owned(),
+		common_data_paths: Vec::new(),
+	};
+
+	let mut games = HashMap::with_capacity(3);
 	games.insert(sse.name.to_lowercase(), sse);
 	games.insert(fo4.name.to_lowercase(), fo4);
+	games.insert(ut99.name.to_lowercase(), ut99);
 
 	games
 } 

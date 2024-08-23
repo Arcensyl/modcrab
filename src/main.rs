@@ -11,7 +11,7 @@ mod util;
 use std::{env, path::PathBuf};
 
 use clap::{Parser, Subcommand};
-use modpack::{build_modpack, init_modpack};
+use modpack::{build_modpack, init_modpack, mount_modpack, run_modpack};
 
 use crate::prelude::*;
 
@@ -34,11 +34,21 @@ enum Command {
 
     /// Builds your modpack's config and acquires any missing mods.
     Build,
+
+	/// Mounts a modpack over the target game.
+	Mount,
+
+	/// Mounts a modpack before running a specified command.
+	Run {
+		/// The command to run.
+		#[clap(required = true, trailing_var_arg = true, allow_hyphen_values = true, num_args = 1..)]
+		cmd: Vec<String>,
+	},
 }
 
 /// Entrypoint for Modcrab.
 fn main() {
-    let args = Cli::parse();
+	let args = Cli::parse();
 
 	let mut old_cwd = None;
 	if let Some(ref remote) = args.remote {
@@ -76,6 +86,8 @@ fn run_command(args: Cli) -> AppResult<()> {
     match args.cmd {
         Command::Init => init_modpack()?,
         Command::Build => build_modpack()?,
+		Command::Mount => mount_modpack(None)?,
+		Command::Run { cmd } => run_modpack(cmd)?,
     }
 
     Ok(())

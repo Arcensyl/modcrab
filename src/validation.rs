@@ -75,7 +75,31 @@ pub fn validate_mod(spec: &ModSpec, data: Option<&mut AppData>) -> AppResult<()>
 	Ok(())
 }
 
-/// Tests an entire list of mods for validity.
+/// Ensures the validity of a modpack's configuration.
+pub fn validate_config(config: &mut AppConfig) -> AppResult<()> {
+	let Some(ref mut target) = config.target else {
+		// This should be caught before this point, but we handle it here for redundancy.
+		return Err(AppError::Modpack(ModpackError::MissingTarget))
+	};
+
+	if !target.root_path.try_exists()? {
+		return Err(AppError::Game(GameError::InvalidPath {
+			label: "root".to_owned(),
+			path: target.root_path.clone(),
+		}));
+	};
+
+	// Changes the mod directory to be absolute, as that is expected by my overlay filesystem.
+	if !target.spec.mod_directory.starts_with("/") {
+		target.spec.mod_directory = format!("/{}", target.spec.mod_directory);
+	}
+
+	// TODO: Handle invalid data path.
+	
+	Ok(())
+}
+
+/// Ensures the validity of an entire list of mods.
 /// This function will eventually download missing mods using the NexusMods API.
 pub fn validate_mod_list(data: &mut AppData, mods: &mut IndexMap<String, ModSpec>) -> AppResult<()> {
 	// This is a stupid hack, but its 7 AM and I just want my code to compile.
