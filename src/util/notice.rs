@@ -210,7 +210,7 @@ impl From<GameError> for Notice {
 				.add_field("Suggestion #2", &format!("Write your own specification for {} so Modcrab knows how to manage it.", target.spec_key)),
 			
 			GameError::ScanUnavailable(label) => notice
-				.add_field("Description", &format!("This config does not explicitly set its target's {label} path, but the game's specification not support automatically determining that path."))
+				.add_field("Description", &format!("This config does not explicitly set its target's {label} path, but that game's specification doesn't support automatically finding that path."))
 				.add_field("Suggestion", &format!("Set 'modcrab.target.{label}' in your config.")),
 			
 			GameError::ScanFailed(label) => notice
