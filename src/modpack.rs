@@ -9,7 +9,6 @@ use crate::{lua::eval_config, prelude::*, util::misc::wait_for_enter_key, valida
 /// This simply creates all missing directories, so it can also repair an existing instance.
 pub fn init_modpack() -> AppResult<()> {
 	fs::create_dir_all(".modcrab")?;
-	fs::create_dir_all("prefix")?;
 
 	fs::create_dir_all("config")?;
 
