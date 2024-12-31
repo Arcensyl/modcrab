@@ -81,7 +81,7 @@ fn main() {
 	}
 }
 
-/// Runs the command specified by the passed CLI arguements.
+/// Runs the command specified by the passed CLI arguments.
 fn run_command(args: Cli) -> AppResult<()> {
     match args.cmd {
         Command::Init => init_modpack()?,

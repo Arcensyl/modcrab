@@ -515,7 +515,7 @@ impl FilesystemMT for ModcrabFS {
             }
         };
 
-        if -1 == result {
+        if result == -1 {
             let e = io::Error::last_os_error();
             error!("chmod({:?}, {:#o}): {}", path, mode, e);
             Err(e.raw_os_error().unwrap())
@@ -555,7 +555,7 @@ impl FilesystemMT for ModcrabFS {
             }
         };
 
-        if -1 == result {
+        if result == -1 {
             let e = io::Error::last_os_error();
             error!(
                 "chown({:?}, {}, {}): {}",
@@ -585,7 +585,7 @@ impl FilesystemMT for ModcrabFS {
             }
         };
 
-        if -1 == result {
+        if result == -1 {
             let e = io::Error::last_os_error();
             error!("truncate({:?}, {}): {}", path, size, e);
             Err(e.raw_os_error().unwrap())
@@ -653,7 +653,7 @@ impl FilesystemMT for ModcrabFS {
             }
         };
 
-        if -1 == result {
+        if result == -1 {
             let e = io::Error::last_os_error();
             error!("utimens({:?}, {:?}, {:?}): {}", path, atime, mtime, e);
             Err(e.raw_os_error().unwrap())
@@ -685,7 +685,7 @@ impl FilesystemMT for ModcrabFS {
             libc::statfs(path_c.as_ptr(), &mut buf)
         };
 
-        if -1 == result {
+        if result == -1 {
             let e = io::Error::last_os_error();
             error!("statfs({:?}): {}", path, e);
             Err(e.raw_os_error().unwrap())
@@ -720,7 +720,7 @@ impl FilesystemMT for ModcrabFS {
             libc::mknod(path_c.as_ptr(), mode as libc::mode_t, rdev as libc::dev_t)
         };
 
-        if -1 == result {
+        if result == -1 {
             let e = io::Error::last_os_error();
             error!("mknod({:?}, {}, {}): {}", real, mode, rdev, e);
             Err(e.raw_os_error().unwrap())

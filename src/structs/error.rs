@@ -70,7 +70,7 @@ pub enum ModpackError {
 		dep: String,
 	},
 
-	/// One or more mods cannot be sorted, which is likely due to the mod having a non-sensical specification.
+	/// One or more mods cannot be sorted, which is likely due to the mod having a nonsensical specification.
 	/// As missing dependencies are already handled, this usually means there is a cyclic dependency somewhere.
 	#[error("These mods cannot be sorted: {0:?}")]
 	UnsortableMods(Vec<ModSpec>),

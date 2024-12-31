@@ -117,7 +117,7 @@ pub struct ModSpec {
 
     /// A numerical priority to hint where a mod should be sorted.
     /// A lower priority is placed earlier in the mod load order.
-    /// If this mod has any that it loads after, a lower priority will place it closer to the latest preceeding mod.
+    /// If this mod has any that it loads after, a lower priority will place it closer to the latest preceding mod.
     pub priority: u32,
 
 	/// Determines if Modcrab will check this mod's structure for validity.

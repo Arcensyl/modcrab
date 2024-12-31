@@ -98,7 +98,7 @@ return {
     -- OS
     os = {
         clock = os.clock,
-        data = os.date,
+        date = os.date,
         difftime = os.difftime,
         getenv = os.getenv,
     },

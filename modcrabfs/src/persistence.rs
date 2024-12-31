@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::tree::VirtualFileTree;
 
 /// Repeatable instructions for manipulating a *VirtualFileTree*.
-/// This is mostly used persistent deletions and file movement.
+/// This is mostly used for persistent deletions and file movement.
 #[derive(Serialize, Deserialize)]
 pub enum VirtualFileTransformation {
     /// A request to delete a file from a tree.
