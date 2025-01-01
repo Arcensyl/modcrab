@@ -191,7 +191,7 @@ impl ModcrabFS {
         tree.map_directory(&self.surface, None)?;
         mem::drop(tree); // Releases write lock
 
-        let args = ["fsname=modcrabfs"].map(OsStr::new);
+        let args = ["fsname=modcrabfs", "nonempty"].map(OsStr::new);
         fuse_mt::mount(FuseMT::new(self, 1), target, &args)
     }
 
@@ -204,7 +204,7 @@ impl ModcrabFS {
         tree.map_directory(&self.surface, None)?;
         mem::drop(tree); // Releases write lock
 
-        let args = ["fsname=modcrabfs"].map(OsStr::new);
+        let args = ["fsname=modcrabfs", "nonempty"].map(OsStr::new);
         fuse_mt::spawn_mount(FuseMT::new(self, 1), target, &args)
     }
 
