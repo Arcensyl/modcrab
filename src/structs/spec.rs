@@ -195,7 +195,7 @@ impl<'lua> FromLua<'lua> for ModSpec {
 
 		let id = table.get::<_, Option<String>>("id")?;
 
-		let dependencies = convert_table_item_to_vec(&table, "dependencies")?;
+		let dependencies = convert_table_item_to_vec(&table, "deps")?;
 
 		let after = convert_table_item_to_vec(&table, "after")?;
 		
